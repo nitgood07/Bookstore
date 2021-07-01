@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
+using Repository;
 
 namespace Bookstore.Api
 {
@@ -33,6 +34,7 @@ namespace Bookstore.Api
         {
             //register logger service.
             services.AddSingleton<ILoggerManager, LoggerManager>();
+            services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
             services.AddControllers();
             services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(Configuration["RepositoryContext"]));
         }
