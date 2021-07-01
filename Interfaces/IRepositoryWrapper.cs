@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Interfaces
 {
-    interface IRepositoryWrapper
+    public interface IRepositoryWrapper
     {
         IBookRepository Book { get; }
         void Save();

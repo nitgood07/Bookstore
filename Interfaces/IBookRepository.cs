@@ -5,11 +5,11 @@ using System.Text;
 
 namespace Interfaces
 {
-    interface IBookRepository:IRepositoryBase<Book>
+    public interface IBookRepository:IRepositoryBase<Book>
     {
         IEnumerable<Book> GetAllBooks();
         Book GetBookById(int bookId);
-        Book GetBookByAuthor(int authorId);
+        IEnumerable<Book> GetBookByAuthor(int authorId);
         void CreateBook(Book book);
         void UpdateBook(Book book);
         void DeleteBook(Book book);
