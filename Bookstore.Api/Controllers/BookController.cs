@@ -37,7 +37,7 @@ namespace Bookstore.Api.Controllers
             }
         }
 
-        [HttpGet("{bookId}")]
+        [HttpGet("{bookId}", Name = "BookById")]
         public IActionResult GetBookById(int bookId)
         {
             try
@@ -83,6 +83,95 @@ namespace Bookstore.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"GetBookByAuthor Something went wrong inside GetBookByAuthor action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult AddBook([FromBody] Book book)
+        {
+            try
+            {
+                if (book == null)
+                {
+                    _logger.LogError("AddBook: Book object sent from client is null.");
+                    return BadRequest("Book object is null");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("AddBook: Invalid book object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+
+                
+                _repository.Book.CreateBook(book);
+                _repository.Save();
+
+                return CreatedAtRoute("BookById", new { id = book.BookId }, book);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"AddBook: Something went wrong inside AddBook action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateBook(int id, [FromBody] Book book)
+        {
+            try
+            {
+                if (book == null)
+                {
+                    _logger.LogError("UpdateBook: Book object sent from client is null.");
+                    return BadRequest("Book object is null");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogError("UpdateBook: Invalid book object sent from client.");
+                    return BadRequest("Invalid model object");
+                }
+
+                var bookEntity = _repository.Book.GetBookById(id);
+                if(bookEntity == null)
+                {
+                    _logger.LogError($"UpdateBook: Book with id: {id}, isn't found.");
+                    return NotFound();
+                }
+                _repository.Book.UpdateBook(bookEntity);
+                _repository.Save();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"UpdateBook: Something went wrong inside AddBook action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteBook(int id)
+        {
+            try
+            {
+                var book = _repository.Book.GetBookById(id);
+                if (book == null)
+                {
+                    _logger.LogError($"DeleteBook: Book with id: {id}, isn't found");
+                    return NotFound();
+                }
+
+                _repository.Book.DeleteBook(book);
+                _repository.Save();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"DeleteBook: Something went wrong inside AddBook action: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
         }
