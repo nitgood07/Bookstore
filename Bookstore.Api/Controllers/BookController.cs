@@ -32,7 +32,57 @@ namespace Bookstore.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Something went wrong inside GetAllBooks action: {ex.Message}");
+                _logger.LogError($"GetAllBooks: Something went wrong inside GetAllBooks action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("{bookId}")]
+        public IActionResult GetBookById(int bookId)
+        {
+            try
+            {
+                var book = _repository.Book.GetBookById(bookId);
+                if (book == null)
+                {
+                    _logger.LogError($"GetBookById: Book with id: {bookId}, isn't found.");
+                    return NotFound();
+                }
+                else
+                {
+                    _logger.LogInfo($"GetBookById: Returned book with id: {bookId}");
+                    return Ok(book);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"GetBookById: Something went wrong inside GetBookById action: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("{authorId}/author")]
+        public IActionResult GetBookByAuthor(int authorId)
+        {
+            try
+            {
+                var books = _repository.Book.GetBookByAuthor(authorId);
+                if (books == null)
+                {
+                    _logger.LogError($"GetBookByAuthor: Books with author id: {authorId}, isn't found.");
+                    return NotFound();
+                }
+                else
+                {
+                    _logger.LogInfo($"GetBookByAuthor: Returned books for author");
+
+                    return Ok(books);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"GetBookByAuthor Something went wrong inside GetBookByAuthor action: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
         }
