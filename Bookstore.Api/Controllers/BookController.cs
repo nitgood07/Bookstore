@@ -1,4 +1,6 @@
-﻿using Entities.Models;
+﻿using AutoMapper;
+using Entities.DTOs;
+using Entities.Models;
 using Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,11 +15,13 @@ namespace Bookstore.Api.Controllers
     {
         private ILoggerManager _logger;
         private IRepositoryWrapper _repository;
+        private IMapper _mapper;
 
-        public BookController(ILoggerManager logger, IRepositoryWrapper repository)
+        public BookController(ILoggerManager logger, IRepositoryWrapper repository, IMapper mapper)
         {
             _logger = logger;
             _repository = repository;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -28,7 +32,8 @@ namespace Bookstore.Api.Controllers
                 var books = _repository.Book.GetAllBooks();
                 _logger.LogInfo($"GetAllBooks: Returned all books from db.");
 
-                return Ok(books);
+                var booksList = _mapper.Map<IEnumerable<BookDTO>>(books);
+                return Ok(booksList);
             }
             catch (Exception ex)
             {
@@ -88,7 +93,7 @@ namespace Bookstore.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddBook([FromBody] Book book)
+        public IActionResult AddBook([FromBody] BookForCreationDTO book)
         {
             try
             {
@@ -104,11 +109,13 @@ namespace Bookstore.Api.Controllers
                     return BadRequest("Invalid model object");
                 }
 
-                
-                _repository.Book.CreateBook(book);
+                var bookEntity = _mapper.Map<Book>(book);
+                _repository.Book.CreateBook(bookEntity);
                 _repository.Save();
 
-                return CreatedAtRoute("BookById", new { id = book.BookId }, book);
+                var createdBook = _mapper.Map<BookDTO>(bookEntity);
+
+                return CreatedAtRoute("BookById", new { bookId = createdBook.BookId }, createdBook);
             }
             catch (Exception ex)
             {

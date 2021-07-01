@@ -35,6 +35,8 @@ namespace Bookstore.Api
             //register logger service.
             services.AddSingleton<ILoggerManager, LoggerManager>();
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+            services.AddAutoMapper(typeof(Startup));
+
             services.AddControllers();
             services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(Configuration["RepositoryContext"]));
             services.AddSwaggerGen(options =>
