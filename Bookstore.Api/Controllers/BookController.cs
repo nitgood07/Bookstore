@@ -56,7 +56,8 @@ namespace Bookstore.Api.Controllers
                 else
                 {
                     _logger.LogInfo($"GetBookById: Returned book with id: {bookId}");
-                    return Ok(book);
+                    var bookResult = _mapper.Map<BookDTO>(book);
+                    return Ok(bookResult);
                 }
 
             }
@@ -81,8 +82,8 @@ namespace Bookstore.Api.Controllers
                 else
                 {
                     _logger.LogInfo($"GetBookByAuthor: Returned books for author");
-
-                    return Ok(books);
+                    var bookList = _mapper.Map<IEnumerable<BookDTO>>(books);
+                    return Ok(bookList);
                 }
             }
             catch (Exception ex)
@@ -125,7 +126,7 @@ namespace Bookstore.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBook(int id, [FromBody] Book book)
+        public IActionResult UpdateBook(int id, [FromBody] BookForCreationDTO book)
         {
             try
             {
@@ -147,6 +148,7 @@ namespace Bookstore.Api.Controllers
                     _logger.LogError($"UpdateBook: Book with id: {id}, isn't found.");
                     return NotFound();
                 }
+                _mapper.Map(book, bookEntity);
                 _repository.Book.UpdateBook(bookEntity);
                 _repository.Save();
 
